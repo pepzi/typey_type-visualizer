@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Typey Type progress visualizer</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		.item {
+			display: inline-block;
+			margin-right: 10px;
+			margin-bottom: 10px;
+			padding: 5px;
+			color: white;
+		}
+	</style>
+</head>
+<body style="margin-left: 50px; margin-top: 50px;">
+	<h1>Typey Type progress visualizer</h1>
+	<form>
+		<label for="json_input">Paste your progress here:</label><br>
+		<textarea id="json_input" rows="10" cols="100"></textarea><br>
+		<button type="button" onclick="generateOutput()">Show progress</button>
+	</form>
+	<div id="output" style="margin-top: 10px;"></div>
+
+	<script>
+		function sortJson(jsonObj) {
+			let sortedObj = {};
+			Object.keys(jsonObj).sort((a, b) => jsonObj[b] - jsonObj[a]).forEach(key => {
+				sortedObj[key] = jsonObj[key];
+			});
+			return sortedObj;
+		}
+
+		function generateOutput() {
+			let jsonInput = document.getElementById("json_input").value;
+			let jsonObj = JSON.parse(jsonInput);
+			let sortedObj = sortJson(jsonObj);
+			let maxVal = sortedObj[Object.keys(sortedObj)[0]];
+			let minVal = sortedObj[Object.keys(sortedObj)[Object.keys(sortedObj).length - 1]];
+			let outputDiv = document.getElementById("output");
+			outputDiv.innerHTML = "";
+			let rowDiv = null;
+			let count = 0;
+			Object.keys(sortedObj).forEach(key => {
+				let val = sortedObj[key];
+				let red = Math.floor(255 * (maxVal - val) / (maxVal - minVal));
+				let green = Math.floor(255 * (val - minVal) / (maxVal - minVal));
+				let itemDiv = document.createElement("div");
+				itemDiv.classList.add("item");
+				itemDiv.innerText = `${key}: ${val}`;
+				itemDiv.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+				if (count % 10 === 0) {
+					rowDiv = document.createElement("div");
+					outputDiv.appendChild(rowDiv);
+				}
+				rowDiv.appendChild(itemDiv);
+				count++;
+			});
+		}
+	</script>
+</body>
+</html>
